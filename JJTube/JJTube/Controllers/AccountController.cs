@@ -49,7 +49,17 @@ namespace JJTube.Controllers
         {
             if (ModelState.IsValid)
             {
+                var sha1 = new SHA1CryptoServiceProvider();
 
+                People user = new People()
+                {
+                    Username = registerUser.Username,
+                    Password = sha1.ComputeHash(Encoding.Unicode.GetBytes(registerUser.Password)).ToString(),
+                    Email = registerUser.Email
+                };
+                context.People.Add(user);
+                context.SaveChanges();
+                return RedirectToAction("Index", "Private");
             }
             return View();
         }
