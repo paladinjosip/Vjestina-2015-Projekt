@@ -1,7 +1,29 @@
-﻿
+﻿@model JJTube.Models.RegisterViewModel
+
 @{
     ViewBag.Title = "Register";
 }
 
 <h2>Register</h2>
-
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new {@class = "form-signin"}))
+{
+    <div class="form-group">
+    @Html.LabelFor(m => m.Username)
+    @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Username, "You must enter username.")
+    </div>
+    
+    <div class="form-group">
+    @Html.LabelFor(m => m.Password)
+    @Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Password, "You must enter password.")
+    </div>
+    
+    <div class="form-group">
+    @Html.LabelFor(m => m.Email)
+    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Email, "You must enter email.")  
+    </div>
+    
+    <input type="submit" value="Register" class="form-control btn btn-primary"/> 
+}
