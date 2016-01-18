@@ -26,5 +26,19 @@ namespace JJTube.Controllers
             return View();
         }
 
+        public ActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Register(RegisterViewModel registerUser)
+        {
+            if (ModelState.IsValid)
+            {
+
+            }
+            return View();
+        }
 	}
 }
