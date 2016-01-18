@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -9,6 +11,7 @@ namespace JJTube.Controllers
 {
     public class AccountController : Controller
     {
+        JJTubeDbContext context = new JJTubeDbContext();
         //
         // GET: /Account/
         public ActionResult Login()
@@ -36,7 +39,17 @@ namespace JJTube.Controllers
         {
             if (ModelState.IsValid)
             {
+                var sha1 = new SHA1CryptoServiceProvider();
 
+                People user = new People()
+                {
+                    Username = registerUser.Username,
+                    Password = sha1.ComputeHash(Encoding.Unicode.GetBytes(registerUser.Password)).ToString(),
+                    Email = registerUser.Email
+                };
+                context.People.Add(user);
+                context.SaveChanges();
+                return RedirectToAction("Index", "Private");
             }
             return View();
         }
