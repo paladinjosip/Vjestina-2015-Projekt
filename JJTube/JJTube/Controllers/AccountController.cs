@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace JJTube.Controllers
 {
@@ -27,12 +28,19 @@ namespace JJTube.Controllers
                 //Odradi povezivanje sa bazom, ako user postoji => cookie + redirect na myLists
 
                 var sha1 = new SHA1CryptoServiceProvider();
-                var password = sha1.ComputeHash(Encoding.Unicode.GetBytes(loginUser.Password));
+                var password = Convert.ToBase64String(sha1.ComputeHash(Encoding.Unicode.GetBytes(loginUser.Password)));
 
                 People user = context.People.FirstOrDefault(x => (x.Username == loginUser.Username && x.Password.Equals(password)));
                 if (user != null) { 
                     //Uspjesan login
-                    return RedirectToAction("Index", "Private");
+                    //Kreiraj cookie sa UserID
+                   FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1, user.UserID.ToString(), DateTime.Now, DateTime.Now.AddMinutes(60), false, user.UserID.ToString(), FormsAuthentication.FormsCookiePath);
+
+                   string hashCookies = FormsAuthentication.Encrypt(ticket);
+                   HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, hashCookies);
+                   cookie.HttpOnly = true;
+                   System.Web.HttpContext.Current.Response.Cookies.Add(cookie);
+                   return RedirectToAction("Index", "Private");
 
                 }
             }
@@ -54,7 +62,7 @@ namespace JJTube.Controllers
                 People user = new People()
                 {
                     Username = registerUser.Username,
-                    Password = sha1.ComputeHash(Encoding.Unicode.GetBytes(registerUser.Password)).ToString(),
+                    Password = Convert.ToBase64String(sha1.ComputeHash(Encoding.Unicode.GetBytes(registerUser.Password))),
                     Email = registerUser.Email
                 };
                 context.People.Add(user);
