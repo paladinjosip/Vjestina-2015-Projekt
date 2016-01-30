@@ -4,9 +4,11 @@
     ViewBag.Title = "Register";
 }
 
-<h2>Register</h2>
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new {@class = "form-signin"}))
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-signin", style = "max-width:360px;max-height:560px;margin:0 auto" }))
 {
+    <h2>Register</h2>
+    
     <div class="form-group">
     @Html.LabelFor(m => m.Username)
     @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })

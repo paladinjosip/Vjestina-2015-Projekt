@@ -12,8 +12,10 @@ namespace JJTube.Models
     {
         [Key]
         public int ItemID { get; set; }
+        [Required]
         public string ItemLink { get; set; }
-
+        [Required]
+        public string ItemName { get; set; }
        // [ForeignKey("Lists")]
        // public int ListID { get; set; }
         public virtual List List { get; set; }

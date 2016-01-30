@@ -1,0 +1,150 @@
+﻿@using JJTube.Models
+@model List
+@{
+    ViewBag.Title = "Playlist";
+}
+<script src="http://www.youtube.com/player_api"></script>
+
+<h2>Play list</h2>
+
+
+<div class="container">
+    <div class="col-md-5">
+        <p id="playlistName">@Model.ListName</p>
+        <div class="list-group">
+            @foreach (Item item in Model.Items) { 
+                <a class="list-group-item" href="@item.ItemLink">@item.ItemName</a>
+            }
+        </div><!--close sidebar-->
+    </div>
+    <div class="col-md-7">
+       
+        <div id="player" style=" display: table; margin: 0 auto;"></div>
+
+    </div>
+</div>
+
+<script>
+    var $currentSong;
+    var player;
+
+
+    $currentSong = $(".list-group a").first();
+    $currentSong.addClass("currentSong active glyphicon glyphicon-music");
+    //	$(".musicFeed").prop("src",$currentSong.attr("href"));
+    //one click on li(song) makes it "selected" and deselects others
+    $(".list-group a").click(function (e) {
+        //prevent from folowing a link
+        e.preventDefault();
+        $(".list-group a").each(function () {
+            $(this).removeClass("active");
+        });
+        $(this).addClass("active");
+
+    });
+
+    //double click on li(song) makes it "currentSong"
+    $(".list-group a").dblclick(function (e) {
+        //prevent from folowing a link
+        e.preventDefault();
+        $(".list-group a").each(function () {
+            $(this).removeClass("currentSong glyphicon glyphicon-music");
+        });
+        $(this).addClass("currentSong  glyphicon glyphicon-music");
+        $currentSong = $(this);
+
+        extractSong();
+        //change iframe src to currentSong
+        playSong(songYTId);
+        //player.loadVideoById(songYTId, 0, "large");
+        //$(".musicFeed").prop("src",$currentSong.attr("href"));
+    });
+
+
+
+    function updateHTML(nextSong) {
+        $(".list-group a").each(function () {
+            $(this).removeClass("currentSong");
+            $(this).removeClass("active glyphicon glyphicon-music");
+        });
+        $(nextSong).addClass("currentSong");
+        $(nextSong).addClass("active glyphicon glyphicon-music");
+        $currentSong = $(nextSong);
+    }
+
+    function extractSong() {
+
+        songHref = $currentSong.attr("href");
+
+        // songYTId=songHref.substring(songHref.lastIndexOf("=")+1,songHref.lastIndexOf("$"));
+        songYTId = songHref.substring(songHref.indexOf("=") + 1, songHref.length);
+    }
+
+
+
+
+</script>
+<script>
+    var $currentSong = $(".list-group  a").first();
+    var songHref;
+    var songYTId;
+    var player;
+
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+
+    //function does some string manipulation to extract youtube id from URL
+    extractSong();
+
+
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '300',
+            width: '400',
+            videoId: songYTId,
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+        event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+
+    var done = false;
+    function onPlayerStateChange(event) {
+        if (event.data == done) {
+            //call function updateHTML to set next song as current....function is located in app.js
+            updateHTML($currentSong.next());
+            //LOADA FAKING SLJEDECI VIDEO :DDDDDD
+            //	 $currentSong= $($currentSong).next();
+            extractSong();
+
+            playSong(songYTId);
+
+        }
+    }
+    function stopVideo() {
+        player.stopVideo();
+    }
+
+    function playSong(songYTId) {
+        player.loadVideoById(songYTId, 0, "large");
+    }
+
+
+</script>

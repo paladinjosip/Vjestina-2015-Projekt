@@ -1,0 +1,64 @@
+﻿@using JJTube.Models
+@model List
+@{
+    ViewBag.Title = "New List";
+}
+
+
+@using (Html.BeginForm("CreateList", "Private", FormMethod.Post,new{@class="form"}))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.ListName)
+        @Html.TextBoxFor(m => m.ListName, new { @class = "form-control", id="textName" })
+        @Html.ValidationMessageFor(m => m.ListName, "Don't forget the username")
+    </div>
+      <div class="form-group">
+        @Html.HiddenFor(m => m.ListID)
+        @Html.HiddenFor(m => m.Items)
+        @Html.HiddenFor(m => m.User)
+    </div>
+
+    <input id="submit" class="btn btn-success form-control" type="submit" value="Save" />
+
+} 
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".form").submit(function (e) {
+            e.preventDefault();
+            var form = $(".form");
+            form.validate();
+
+            if ($(".form").valid()) {
+                console.log("1  " + values);
+
+                var values =
+                    {
+                        "ListName": $("#textName").val()
+
+                    }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CreateList", "Private")   ",
+                    data: values,
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc(data) {
+                console.log(values);
+                //Remove deleted item
+                //Smisli nesto bolje od glupog reloada..neki ajax model refresh nesto..
+                location.reload();
+
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        }
+
+        });
+    });
+</script>

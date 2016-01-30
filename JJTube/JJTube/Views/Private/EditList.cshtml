@@ -1,0 +1,238 @@
+﻿@using JJTube.Models;
+@model List
+@{
+    ViewBag.Title = "Edit List";
+}
+
+<h2>Edit List</h2>
+
+@using (Html.BeginForm("EditList", "Private", FormMethod.Post, new { @class = "form" }))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.ListName)
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 pull-left">
+                    @Html.TextBoxFor(m => m.ListName, new { @class = "form-control", id = "textListName" })
+                </div>
+                <div class="col-md-1 pull-left">
+                    <button class="btn btn-success form-control" type="submit"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+                </div>
+
+                <div class="col-md-1 pull-left">
+                    <button class="btn btn-success form-control" id="playList"><span class="glyphicon glyphicon-play"></span></button>
+                </div>
+            </div>
+        </div>
+
+        @Html.ValidationMessageFor(m => m.ListName, "Don't forget the username")
+        @Html.HiddenFor(m => m.Items)
+        @Html.HiddenFor(m => m.ListID)
+        @Html.HiddenFor(m => m.User)
+    </div>
+
+    <table class="table">
+    <tr>
+        <th>
+           Item Name
+        </th>
+        <th>
+           Item Link
+        </th>
+        <th>
+           Item ID
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.Items)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ItemName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ItemLink)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ItemID)
+        </td>
+        <td>
+            <a data-toggle="modal" data-target="#myModal"  class="edit" href="#" data-id="@Url.Action("EditItem", "Private", new { id = item.ItemID })">Edit</a> | 
+            <a id="@item.ItemID" class="delete" href="@Url.Action("DeleteItem", "Private", new { id = item.ItemID })">Delete</a>
+            
+        </td>
+    </tr>
+}
+        <tr>
+            <td>
+                <a id="newItem" class='edit' data-toggle='modal' data-target='#myModal' data-id='@Url.Action("EditItem", "Private")' href='#'>Add New Item</a>
+            </td>
+         
+        </tr>  
+</table>
+    
+
+    <div class="container">
+        <div class="row">
+            
+                <div class="col-md-1 pull-right">
+                    <button data-id="@Model.ListID" id="deleteList" class="btn btn-danger form-control"><span class="glyphicon glyphicon-trash"></span></button>
+                </div>
+        </div>
+
+        </div>
+    
+
+} 
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" >
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="title">Add List Item</h4>
+            </div>
+            <div class="modal-body">
+           
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".delete").click(function (e) {
+            //Removing newly added list item
+            if ($(this).attr('id') == "newI") {
+                $(this).remove();
+                return;
+            }
+            //Removing existing list item from database 
+            var id = $(this).attr('id');
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: $(this).attr('href'),
+                data: param = "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc(data) {
+                
+                //Remove deleted item
+                $("#" + id).parent().parent().remove();
+
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+        });
+
+        $("#newItem").click(function (e) {
+            e.preventDefault();
+  
+        });
+
+        $("#editItem").click(function (e) {
+            e.preventDefault();
+
+
+        });
+
+        $('#myModal').on('show.bs.modal', function (e) {
+
+            
+            var id = $(e.relatedTarget).data('id');
+            console.log(id);
+            $.get(id, function (data) {
+                
+                      $(".modal-body").html(data);
+                  });
+          
+            // else
+            //     $('#myModal').css({ 'top': mouseY, 'left': mouseX, 'backdrop': 'static' });
+
+        });
+
+        $(".form").submit(function(e) {
+            e.preventDefault();
+            var form = $(".form");
+            form.validate();
+
+            if ($(".form").valid()) {
+
+                var values =
+                    {
+                        "ListName": $("#textListName").val()
+
+                    }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditList", "Private")",
+                    data: values,
+                    success: successFunc,
+                    error: errorFunc
+                });
+                function successFunc(data) {
+                    console.log(values);
+                    //Remove deleted item
+                    //Smisli nesto bolje od glupog reloada..neki ajax model refresh nesto..
+                    location.reload();
+
+                }
+
+                function errorFunc() {
+                    alert('error');
+                }
+            }
+        
+
+        });
+       
+        $("#deleteList").click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr("data-id");
+            console.log("gaysurur" + id);
+            var values =
+                   {
+                       "ListID": id
+
+                   }
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteList", "Private")",
+                data: values,
+            success: successFunc2,
+            error: errorFunc2
+            });
+            function successFunc2(data) {
+                console.log(data);
+                window.location.href = data;
+                //Remove deleted item
+                //Smisli nesto bolje od glupog reloada..neki ajax model refresh nesto.            
+            }
+            function errorFunc2() {
+                alert('error');
+            }
+
+        });
+        $("#playList").click(function (e) {
+            e.preventDefault();
+            window.location.href = '@Url.Action("Playlist","Private")' + '/' + '@Model.ListID';
+            
+        });
+           
+    });
+</script>
+

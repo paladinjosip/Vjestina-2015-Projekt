@@ -16,6 +16,7 @@ namespace JJTube.Controllers
       //     return View();
       // }
         JJTubeDbContext context = new JJTubeDbContext();
+       
 
     public ActionResult Index()
     {

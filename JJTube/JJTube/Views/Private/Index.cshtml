@@ -1,8 +1,122 @@
-﻿@model string
+﻿@using JJTube.Models;
+@model IEnumerable<List>
 @{
     ViewBag.Title = "Index";
 }
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
 
-<h2>Index</h2>
-fucking youre - -@Model-<br />
-asdasd
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">List Gallery</h1>
+        </div>
+        <div class="col-lg-3 col-md-4 col-xs-6 thumb" >
+            <a data-toggle="modal" data-target="#NewModal" class="thumbnail" style=" position: relative; border-style: dashed;" >
+                <img class="img-responsive" src="~/Content/background.jpg" alt="">
+                <div class="caption" style="position: absolute;top: 45%;left: 0;text-align: center;width: 100%; font-weight:bold;font-size:1.1em;color:azure">
+                    Add New List
+                </div>
+            </a>
+        </div>
+        @foreach (List list in Model)
+        {
+           <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+               <a class="thumbnail" style=" position:relative;" data-toggle="modal" data-id="@list.ListID" data-name="@list.ListName" data-target="#myModal">
+                   <img class=" img-responsive" src="~/Content/background.jpg" alt="">
+                   <div class="caption" style="position: absolute;top: 45%;left: 0;text-align: center;width: 100%; font-weight:bold;font-size:1.1em">
+                       @list.ListName
+                   </div>
+               </a>
+            </div>
+    <!--<a  data-toggle="modal" data-id="@list.ListID" data-target="#myModal">Open Modal @list.ListID</a>-->
+        }
+
+
+
+    </div>
+   
+</div>
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" >
+    <div class="modal-dialog"style="width: auto !important;  float: left" >
+
+        <!-- Modal content-->
+        <div id="myModalContent"class="modal-content" style="width:auto !important; float:left">
+            <div class="modal-header" style="width: auto !important;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="title" style="padding-right:25px"></h4>
+            </div>
+            <div style="height:1px;clear:both"></div>
+            <div class="modal-body" style="width: auto !important; float: left">
+                <a class="btn btn-primary" id="edit" style="">Edit </a>
+                <a class="btn btn-primary" id="play">Play </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="NewModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2>New List</h2>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("NewList", new  List())
+               
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        //triggered when modal is about to be shown
+        var mouseX;
+        var mouseY;
+        var left, top;
+        var maxH, maxW;
+         $('#myModal').on('show.bs.modal', function (e) {
+
+             var id = $(e.relatedTarget).data('id');
+             var name = $(e.relatedTarget).data('name');
+             $("#edit").attr('href', '@Url.Action("EditList", "Private")' +"/"+ id);
+             $("#play").attr('href', '@Url.Action("Playlist", "Private")' + "/" + id);
+             $("#title").text(name)
+         
+             $('#myModalContent').css({ 'top':top, 'left': left, 'backdrop': 'static', 'max-height':maxH ,'max-width':maxW, 'overflow':'auto'});
+            // else
+            //     $('#myModal').css({ 'top': mouseY, 'left': mouseX, 'backdrop': 'static' });
+       
+         });
+
+       
+        $(".thumbnail").mouseup(function (e) {
+            mouseX = e.pageX;
+            mouseY = e.pageY;
+            
+          
+            left = $(this).parent().offset().left;
+            top = $(this).parent().offset().top;
+            maxH = $(this).height();
+            maxW = $(this).width();
+          // top = mouseY;
+            // left = mouseX;
+            
+            console.log(maxH + " " + maxW);
+        });
+       
+    });
+</script>
+

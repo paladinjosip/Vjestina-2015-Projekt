@@ -1,0 +1,73 @@
+﻿@using JJTube.Models
+@model Item
+<script src="~/Scripts/jquery-2.2.0.min.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+
+                @using (Html.BeginForm("EditItem", "Private", FormMethod.Post, new { @class = "form" }))
+                {
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        @Html.TextBoxFor(m => m.ItemName, new { @class = "form-control", id = "textName" })
+                        @Html.ValidationMessageFor(m => m.ItemName, "Don't forget the name")
+                    </div>
+                    <div class="form-group">
+                        <label>Item Link</label>
+                        @Html.TextBoxFor(m => m.ItemLink, new { @class = "form-control", id = "textLink" })
+                        @Html.ValidationMessageFor(m => m.ItemLink, "Don't forget the link")
+                    </div>
+                    <div class="form-group">
+                        @Html.HiddenFor(m => m.ItemID, new { id = "textID" })
+                        @Html.HiddenFor(m => m.List, new { id = "textList" })
+
+                    </div>
+
+                    <input id="submit" class="btn btn-success form-control" type="submit" value="Save" />
+
+                }
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".form").submit(function (e) {
+            e.preventDefault();
+            var form = $(".form");
+            form.validate();
+
+            if ($(".form").valid()) {         
+
+                var values =
+                    {
+                        "ItemName": $("#textName").val(),
+                        "ItemLink": $("#textLink").val(),
+                        "ItemID": $("#textID").val()
+                     
+
+                    }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditItem", "Private")",
+                    data: values,
+                    success: successFunc,
+                    error: errorFunc
+                });
+                function successFunc(data) {
+                    console.log(values);
+                    //Remove deleted item
+                    //Smisli nesto bolje od glupog reloada..neki ajax model refresh nesto..
+                    location.reload();
+
+                }
+
+                function errorFunc() {
+                    alert('error');
+                }
+
+            }
+
+        });
+    });
+    
+</script>

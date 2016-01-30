@@ -71,5 +71,10 @@ namespace JJTube.Controllers
             }
             return View();
         }
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "Home");
+        }
 	}
 }
